@@ -1,53 +1,47 @@
 /*
-  IMU Classifier
-  This example uses the on-board IMU to start reading acceleration and gyroscope
-  data from on-board IMU, once enough samples are read, it then uses a
-  TensorFlow Lite (Micro) model to try to classify the movement as a known gesture.
-  Note: The direct use of C/C++ pointers, namespaces, and dynamic memory is generally
-        discouraged in Arduino examples, and in the future the TensorFlowLite library
-        might change to make the sketch simpler.
-  The circuit:
-  - Arduino Nano 33 BLE or Arduino Nano 33 BLE Sense Rev2 board.
-  Created by Don Coleman, Sandeep Mistry
-  Modified by Dominic Pajak, Sandeep Mistry
+  Gesture Classifier
+  This sketch demonstrates the use of the ArduTFLite library to recognize the two gestures "punch" and "flex"
+  through readings from the IMU sensor integrated into the Arduino Nano 33 BLE board.
+  This example is an updated variation of the famous tutorial created by Don Coleman, Sandeep Mistry,
+  and Dominic Pajak in 2019.
+  Along with the sketch, the file model.h is included, which contains a pre-trained model.
+
+  The sketch was created and tested on Arduino Nano 33 BLE rev 1 and rev 2 boards, but it can be adapted
+  to run on other boards, compatible with the library, which have an IMU sensor connected with a sampling
+  frequency close to 100 Hz.
+
+  CIRCUIT: Arduino Nano 33 BLE Rev.1 or Rev.2
+
+  USAGE: uncomment IMU sensor library, according to yor board revision, compile, load and open serial monitor
+         keep the board in your hand and do a gesture!
+
+
   This example code is in the public domain.
 */
 
-#include "Arduino_BMI270_BMM150.h"
+// Uncomment library definition, according to your board version
+//#include <Arduino_LSM9DS1.h> // IMU Sensor Library for Arduino Nano 33 BLE Rev.1
+#include <Arduino_BMI270_BMM150.h> // IMU Sensor Library for Arduino Nano 33 BLE Rev.2
 
-#include <TensorFlowLite.h>
-#include <tensorflow/lite/micro/all_ops_resolver.h>
-#include <tensorflow/lite/micro/micro_error_reporter.h>
-#include <tensorflow/lite/micro/micro_interpreter.h>
-#include <tensorflow/lite/schema/schema_generated.h>
-#include <tensorflow/lite/version.h>
+#include <ArduTFLite.h>
 
 #include "model.h"
 
-const float accelerationThreshold = 2.5; // threshold of significant in G's
-const int numSamples = 119;
+const float accelerationThreshold = 2.5; // Threshold (in G values) to detect a "gesture" start
+const int numSamples = 119; // Number of samples for a single gesture
 
-int samplesRead = numSamples;
+int samplesRead; // sample counter
+const int inputLength = 714; // dimension of input tensor (6 values * 119 samples)
 
-// global variables used for TensorFlow Lite (Micro)
-tflite::MicroErrorReporter tflErrorReporter;
-
-// pull in all the TFLM ops, you can remove this line and
-// only pull in the TFLM ops you need, if would like to reduce
-// the compiled size of the sketch.
-tflite::AllOpsResolver tflOpsResolver;
-
-const tflite::Model* tflModel = nullptr;
-tflite::MicroInterpreter* tflInterpreter = nullptr;
-TfLiteTensor* tflInputTensor = nullptr;
-TfLiteTensor* tflOutputTensor = nullptr;
-
-// Create a static memory buffer for TFLM, the size may need to
-// be adjusted based on the model you are using
+// The Tensor Arena memory area is used by TensorFlow Lite to store input, output and intermediate tensors
+// It must be defined as a global array of byte (or u_int8 which is the same type on Arduino)
+// The Tensor Arena size must be defined by trials and errors. We use here a quite large value.
+// The alignas(16) directive is used to ensure that the array is aligned on a 16-byte boundary,
+// this is important for performance and to prevent some issues on ARM microcontroller architectures.
 constexpr int tensorArenaSize = 8 * 1024;
-byte tensorArena[tensorArenaSize] __attribute__((aligned(16)));
+alignas(16) byte tensorArena[tensorArenaSize];
 
-// array to map gesture index to a name
+// a simple table to map gesture labels
 const char* GESTURES[] = {
   "punch",
   "flex"
@@ -59,95 +53,89 @@ void setup() {
   Serial.begin(9600);
   while (!Serial);
 
-  // initialize the IMU
+  // init IMU sensor
   if (!IMU.begin()) {
-    Serial.println("Failed to initialize IMU!");
-    while (1);
+    Serial.println("IMU sensor init failed!");
+    while (true); // stop program here.
   }
 
-  // print out the samples rates of the IMUs
-  Serial.print("Accelerometer sample rate = ");
+  // print IMU sampling frequencies
+  Serial.print("Accelerometer sampling frequency = ");
   Serial.print(IMU.accelerationSampleRate());
   Serial.println(" Hz");
-  Serial.print("Gyroscope sample rate = ");
+  Serial.print("Gyroscope sampling frequency = ");
   Serial.print(IMU.gyroscopeSampleRate());
   Serial.println(" Hz");
 
   Serial.println();
-
-  // get the TFL representation of the model byte array
-  tflModel = tflite::GetModel(model);
-  if (tflModel->version() != TFLITE_SCHEMA_VERSION) {
-    Serial.println("Model schema mismatch!");
-    while (1);
+  Serial.println("Init model..");
+  if (!modelInit(model, tensorArena, tensorArenaSize)){
+    Serial.println("Model initialization failed!");
+    while(true);
   }
-
-  // Create an interpreter to run the model
-  tflInterpreter = new tflite::MicroInterpreter(tflModel, tflOpsResolver, tensorArena, tensorArenaSize, &tflErrorReporter);
-
-  // Allocate memory for the model's input and output tensors
-  tflInterpreter->AllocateTensors();
-
-  // Get pointers for the model's input and output tensors
-  tflInputTensor = tflInterpreter->input(0);
-  tflOutputTensor = tflInterpreter->output(0);
+  Serial.println("Model initialization done.");
 }
 
 void loop() {
   float aX, aY, aZ, gX, gY, gZ;
 
-  // wait for significant motion
-  while (samplesRead == numSamples) {
+  // wait for a significant movement
+  while (true) {
     if (IMU.accelerationAvailable()) {
-      // read the acceleration data
+      // read linear acceleration
       IMU.readAcceleration(aX, aY, aZ);
 
-      // sum up the absolutes
+      // compute absolute value of total acceleration
       float aSum = fabs(aX) + fabs(aY) + fabs(aZ);
 
-      // check if it's above the threshold
+      // if total absolute acceleration is over the threshold a gesture has started
       if (aSum >= accelerationThreshold) {
-        // reset the sample read count
-        samplesRead = 0;
-        break;
+        samplesRead = 0; // init samples counter
+        break; // exit from waiting cycle
       }
     }
   }
 
-  // check if the all the required samples have been read since
-  // the last time the significant motion was detected
+  // reading cycle of all samples for current gesture
   while (samplesRead < numSamples) {
-    // check if new acceleration AND gyroscope data is available
+    // check if a sample is available
     if (IMU.accelerationAvailable() && IMU.gyroscopeAvailable()) {
-      // read the acceleration and gyroscope data
+      // read acceleration and gyroscope values
       IMU.readAcceleration(aX, aY, aZ);
       IMU.readGyroscope(gX, gY, gZ);
 
-      // normalize the IMU data between 0 to 1 and store in the model's
-      // input tensor
-      tflInputTensor->data.f[samplesRead * 6 + 0] = (aX + 4.0) / 8.0;
-      tflInputTensor->data.f[samplesRead * 6 + 1] = (aY + 4.0) / 8.0;
-      tflInputTensor->data.f[samplesRead * 6 + 2] = (aZ + 4.0) / 8.0;
-      tflInputTensor->data.f[samplesRead * 6 + 3] = (gX + 2000.0) / 4000.0;
-      tflInputTensor->data.f[samplesRead * 6 + 4] = (gY + 2000.0) / 4000.0;
-      tflInputTensor->data.f[samplesRead * 6 + 5] = (gZ + 2000.0) / 4000.0;
+      // normalize sensor data because model was trained using normalized data
+      aX = (aX + 4.0) / 8.0;
+      aY = (aY + 4.0) / 8.0;
+      aZ = (aZ + 4.0) / 8.0;
+      gX = (gX + 2000.0) / 4000.0;
+      gY = (gY + 2000.0) / 4000.0;
+      gZ = (gZ + 2000.0) / 4000.0;
+
+      // put the 6 values of current sample in the proper position
+      // in the input tensor of the model
+      modelSetInput(aX,samplesRead * 6 + 0);
+      modelSetInput(aY,samplesRead * 6 + 1);
+      modelSetInput(aZ,samplesRead * 6 + 2);
+      modelSetInput(gX,samplesRead * 6 + 3);
+      modelSetInput(gY,samplesRead * 6 + 4);
+      modelSetInput(gZ,samplesRead * 6 + 5);
 
       samplesRead++;
 
+      // if all samples are got, run inference
       if (samplesRead == numSamples) {
-        // Run inferencing
-        TfLiteStatus invokeStatus = tflInterpreter->Invoke();
-        if (invokeStatus != kTfLiteOk) {
-          Serial.println("Invoke failed!");
-          while (1);
+        if(!modelRunInference()){
+          Serial.println("RunInference Failed!");
           return;
         }
 
-        // Loop through the output tensor values from the model
+        // get output values and print as percentage
         for (int i = 0; i < NUM_GESTURES; i++) {
           Serial.print(GESTURES[i]);
           Serial.print(": ");
-          Serial.println(tflOutputTensor->data.f[i], 6);
+          Serial.print(modelGetOutput(i)*100, 2);
+          Serial.println("%");
         }
         Serial.println();
       }
