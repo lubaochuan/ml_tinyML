@@ -1,13 +1,15 @@
-[Get Started With Machine Learning on Arduino](https://docs.arduino.cc/tutorials/nano-33-ble-sense-rev2/get-started-with-machine-learning)
+## Sources
 
-[Gesture recognition tutorial](https://colab.research.google.com/github/arduino/ArduinoTensorFlowLiteTutorials/blob/master/GestureToEmoji/arduino_tinyml_workshop.ipynb)
+* [Get Started With Machine Learning on Arduino](https://docs.arduino.cc/tutorials/nano-33-ble-sense-rev2/get-started-with-machine-learning)
 
-[Updated and working version of `imu_classify`](https://github.com/spaziochirale/ArduTFLite/tree/main/examples/ArduinoNano33BLE_GestureClassifier)
+* [Gesture recognition tutorial](https://colab.research.google.com/github/arduino/ArduinoTensorFlowLiteTutorials/blob/master/GestureToEmoji/arduino_tinyml_workshop.ipynb)
 
-[Machine Learning on Arduino BLE (YouTube playlist)](
+* [Updated and working version of `imu_classify`](https://github.com/spaziochirale/ArduTFLite/tree/main/examples/ArduinoNano33BLE_GestureClassifier)
+
+* [Machine Learning on Arduino BLE (YouTube playlist)](
 https://youtube.com/playlist?list=PL3E6XmqhhLBHXX2fG2dVER-LOq_7nl9p6&si=RG9CdAHWtexIOo61)
 
-Steps:
+## Steps
 * Install Arduino IDE
 * Tools -> Board -> Board Manager -> install "Arduino Mbed OS Nano Boards"
 * Sketch -> Include library -> Manage Library -> search "Arduino APDS9960"
@@ -23,4 +25,16 @@ https://www.szynalski.com/tone-generator/
 
 https://github.com/AnbuKumar-maker/Machine-Learning-on-Arduino-33-BLE-Sense
 
-[Exercises](https://github.com/arduino/ArduinoTensorFlowLiteTutorials/tree/master/GestureToEmoji/exercises)
+## Exercises
+
+* [Exercises](https://github.com/arduino/ArduinoTensorFlowLiteTutorials/tree/master/GestureToEmoji/exercises)
+
+## Courses
+
+* [Introduction to Embedded Machine Learning (Coursera)](https://www.coursera.org/learn/introduction-to-embedded-machine-learning)
+
+* [Fundamentals of TinyML (EdX)](https://learning.edx.org/course/course-v1:HarvardX+TinyML1+1T2025)
+
+* [Applications of TinyML (EdX)](https://learning.edx.org/course/course-v1:HarvardX+TinyML2+1T2025/home)
+
+
