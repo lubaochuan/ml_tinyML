@@ -1,16 +1,11 @@
-## Sources
+## TinyML
 
-* [Get Started With Machine Learning on Arduino](https://docs.arduino.cc/tutorials/nano-33-ble-sense-rev2/get-started-with-machine-learning)
+[What is TinyML](https://youtu.be/0TopiSoKDp0?si=70d52duJkL69KhgV) (video)
 
-* [Gesture recognition tutorial](https://colab.research.google.com/github/arduino/ArduinoTensorFlowLiteTutorials/blob/master/GestureToEmoji/arduino_tinyml_workshop.ipynb)
-
-* [Updated and working version of `imu_classify`](https://github.com/spaziochirale/ArduTFLite/tree/main/examples/ArduinoNano33BLE_GestureClassifier)
-
-* [Machine Learning on Arduino BLE (YouTube playlist)](
-https://youtube.com/playlist?list=PL3E6XmqhhLBHXX2fG2dVER-LOq_7nl9p6&si=RG9CdAHWtexIOo61)
+[TinyML on the Arduino Nano 33 BLE Sense REV2: AI in Your Pocket](https://youtu.be/WtZBWChAuuk?si=IT2B_nyV_99-lZuh) (video)
 
 ## Steps
-* Install Arduino IDE
+* Install "Arduino IDE"
 * Tools -> Board -> Board Manager -> install "Arduino Mbed OS Nano Boards"
 * Sketch -> Include library -> Manage Library -> search "Arduino APDS9960"
 * Sketch -> Include library -> Manage Library -> search "Arduino Sound" (for SAMD21)
@@ -28,6 +23,17 @@ https://github.com/AnbuKumar-maker/Machine-Learning-on-Arduino-33-BLE-Sense
 ## Exercises
 
 * [Exercises](https://github.com/arduino/ArduinoTensorFlowLiteTutorials/tree/master/GestureToEmoji/exercises)
+
+## Resources
+
+* [Get Started With Machine Learning on Arduino](https://docs.arduino.cc/tutorials/nano-33-ble-sense-rev2/get-started-with-machine-learning)
+
+* [Gesture recognition tutorial](https://colab.research.google.com/github/arduino/ArduinoTensorFlowLiteTutorials/blob/master/GestureToEmoji/arduino_tinyml_workshop.ipynb)
+
+* [Updated and working version of `imu_classify`](https://github.com/spaziochirale/ArduTFLite/tree/main/examples/ArduinoNano33BLE_GestureClassifier)
+
+* [Machine Learning on Arduino BLE (YouTube playlist)](
+https://youtube.com/playlist?list=PL3E6XmqhhLBHXX2fG2dVER-LOq_7nl9p6&si=RG9CdAHWtexIOo61)
 
 ## Courses
 
