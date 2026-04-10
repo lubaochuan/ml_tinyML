@@ -16,6 +16,10 @@
 * File -> Examples -> Arduino APDS
 * File -> Examples -> Arduino_TensorFlow_Lite -> magic_wand
 
+Download this repository as a zip file https://github.com/tensorflow/tflite-micro-arduino-examples
+
+Unzip the file into Arduino IDE libraries directory, `~/Arduino/libraries` on Linux, `~/Documents/Arduino/libraries/` on MacOS, and `My Documents\Arduino\Libraries` on Windows.
+
 https://www.szynalski.com/tone-generator/
 
 https://github.com/AnbuKumar-maker/Machine-Learning-on-Arduino-33-BLE-Sense
