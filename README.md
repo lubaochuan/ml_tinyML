@@ -1,11 +1,11 @@
 ## TinyML
 
-[What is TinyML](https://youtu.be/0TopiSoKDp0?si=70d52duJkL69KhgV) (video)
+* [What is TinyML](https://youtu.be/0TopiSoKDp0?si=70d52duJkL69KhgV) (video)
 
-[TinyML on the Arduino Nano 33 BLE Sense REV2: AI in Your Pocket](https://youtu.be/WtZBWChAuuk?si=IT2B_nyV_99-lZuh) (video)
+* [TinyML on the Arduino Nano 33 BLE Sense REV2: AI in Your Pocket](https://youtu.be/WtZBWChAuuk?si=IT2B_nyV_99-lZuh) (video)
 
-## Steps
-* Install "Arduino IDE"
+## IDE Setup
+* Install "Arduino IDE" https://www.arduino.cc/en/software/
 * Tools -> Board -> Board Manager -> install "Arduino Mbed OS Nano Boards"
 * Sketch -> Include library -> Manage Library -> search "Arduino APDS9960"
 * Sketch -> Include library -> Manage Library -> search "Arduino Sound" (for SAMD21)
@@ -13,12 +13,15 @@
 * Sketch -> Include library -> Manage Library -> search "Arduino_LPS22HB"
 * Sketch -> Include library -> Manage Library -> search "Arduino_HTS221" (replaced by **Arduino_HS300x**)
 * Sketch -> Include library -> Manage Library -> search "Arduino_TensorFlowLite" (replaced by ArduTFLite)
+
+## Test Sensors
 * File -> Examples -> Arduino APDS
 * File -> Examples -> Arduino_TensorFlow_Lite -> magic_wand
 
-Download this repository as a zip file https://github.com/tensorflow/tflite-micro-arduino-examples
-
-Unzip the file into Arduino IDE libraries directory, `~/Arduino/libraries` on Linux, `~/Documents/Arduino/libraries/` on MacOS, and `My Documents\Arduino\Libraries` on Windows.
+## Download Additional Examples
+* Download this repository as a zip file https://github.com/tensorflow/tflite-micro-arduino-examples
+* Unzip the file into Arduino IDE libraries directory, `~/Arduino/libraries` on Linux, `~/Documents/Arduino/libraries/` on MacOS, and `My Documents\Arduino\Libraries` on Windows.
+* Rename the directory to "Arduino_TensorFlowLite".
 
 https://www.szynalski.com/tone-generator/
 
